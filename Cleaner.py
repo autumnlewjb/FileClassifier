@@ -68,9 +68,21 @@ class Cleaner:
                 exist = os.path.exists(new_dir)
                 if not exist:
                     os.mkdir(new_dir)
-                new_dir = new_dir + '/' + filename
+
+                new_dir = new_dir + '\\' + filename
+                print(new_dir)
                 if not os.path.isfile(new_dir):
                     os.rename(old_dir,new_dir)
+                else:
+                    count = 1
+                    new_new_dir = self.rename_repetition(new_dir,count)
+                    print(new_new_dir)
+                    while os.path.exists(new_new_dir):
+                        count += 1
+                        new_new_dir = self.rename_repetition(new_dir,count)
+                        print("enter loop")
+
+                    os.rename(old_dir,new_new_dir)
 
 
     def identify_destination(self,filename,extension_dict):
@@ -86,11 +98,18 @@ class Cleaner:
 
                 if not repeat:
                     break
-        return (self.destination_dir + '/' + type)
+        return (self.destination_dir + '\\' + type)
 
     def main_process(self):
         if self.detect_new_folder():
             self.moving_file(extensions)
+
+
+    def rename_repetition(self,new_dir,no):
+        break_dir = os.path.splitext(new_dir)
+        new_dir = str(break_dir[0]) + "(" + str(no) + ")" + str(break_dir[1])
+        return new_dir
+
 
 print(sys.executable)
 main_folder = str(input('What name would you like for the main folder? '))
