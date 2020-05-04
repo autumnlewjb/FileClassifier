@@ -28,7 +28,9 @@ extensions = {
 class Cleaner(FileSystemEventHandler):
     def __init__(self,only_folder_exist):
         self.only_folder_exist = only_folder_exist
-        self.track_dir = os.getcwd()
+        # self.track_dir = os.getcwd()
+        self.track_dir = 'C:\\Users\\autum\\Desktop'
+        self.destination_dir = self.validate_dir()
 
 
     def validate_dir(self):
@@ -45,7 +47,7 @@ class Cleaner(FileSystemEventHandler):
                 self.only_folder_exist = check_list[i]
             i+=1
 
-        self.destination_dir = self.track_dir + self.only_folder_exist
+        return self.track_dir + self.only_folder_exist
 
     def detect_new_folder(self):
         ans = False
@@ -103,7 +105,7 @@ class Cleaner(FileSystemEventHandler):
                     break
         return (self.destination_dir + '\\' + type)
 
-    def main_process(self, event):
+    def on_modified(self, event):
         if self.detect_new_folder():
             self.moving_file(extensions)
 
@@ -119,6 +121,7 @@ main_folder = str(input('What name would you like for the main folder? '))
 observer = Observer()
 obj = Cleaner(main_folder)
 obj.validate_dir()
+
 print('Clearing ' + obj.track_dir + '...')
 print('Destination Folder at ' + obj.destination_dir)
 observer.schedule(obj, obj.track_dir, recursive=True)
@@ -129,6 +132,7 @@ if permission == 'y':
 try:
     while True:
         sleep(3)
+        print("Running...")
 except KeyboardInterrupt:
     print('PROCESS ENDED...')
     observer.stop()
