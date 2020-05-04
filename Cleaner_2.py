@@ -3,6 +3,8 @@ import sys
 import shutil
 # from Extension import extensions
 from time import sleep
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 extensions = {
     'Audio' : ['.aif','.cda','.mid','.midi','.mp3','.mpa','.ogg','.wav','.wma','.wpl'],
@@ -22,7 +24,8 @@ extensions = {
     'Text' : ['.doc','.docx','.odt','.pdf','.rtf','.tex','.txt','.wpd'],
 }
 
-class Cleaner:
+
+class Cleaner(FileSystemEventHandler):
     def __init__(self,only_folder_exist):
         self.only_folder_exist = only_folder_exist
         self.track_dir = os.getcwd()
@@ -100,7 +103,7 @@ class Cleaner:
                     break
         return (self.destination_dir + '\\' + type)
 
-    def main_process(self):
+    def main_process(self, event):
         if self.detect_new_folder():
             self.moving_file(extensions)
 
@@ -113,22 +116,20 @@ class Cleaner:
 
 print(sys.executable)
 main_folder = str(input('What name would you like for the main folder? '))
+observer = Observer()
 obj = Cleaner(main_folder)
 obj.validate_dir()
 print('Clearing ' + obj.track_dir + '...')
 print('Destination Folder at ' + obj.destination_dir)
+observer.schedule(obj, obj.track_dir, recursive=True)
 permission = str(input('Proceed?(Y/N) ')).lower()[0]
-count = 0
-while permission == 'y':
-    try:
-        obj.main_process()
 
+if permission == 'y':
+    observer.start()
+try:
+    while True:
         sleep(3)
-        count += 1
-        print(count)
-        if count == 50:
-            count = 0
-            permission = str(input('Proceed?(Y/N) ')).lower()[0]
-    except KeyboardInterrupt:
-        break
-print('PROCESS ENDED...')
+except KeyboardInterrupt:
+    print('PROCESS ENDED...')
+    observer.stop()
+observer.join()
