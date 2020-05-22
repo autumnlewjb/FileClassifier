@@ -25,6 +25,7 @@ extensions = {
 class Cleaner:
     def __init__(self,only_folder_exist):
         self.only_folder_exist = only_folder_exist
+        import pdb; pdb.set_trace()
         self.track_dir = os.getcwd()
 
 
